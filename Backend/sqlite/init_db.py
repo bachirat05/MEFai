@@ -1,3 +1,5 @@
+# Fichier pour Initialiser la base ; centraliser la création des tables et des index
+
 from Backend.sqlite.database import Base, engine
 
 # Ces imports garantissent que les modèles sont enregistrés
