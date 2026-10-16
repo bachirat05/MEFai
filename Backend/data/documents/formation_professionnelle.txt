@@ -1,0 +1,18 @@
+DOCUMENT DE DÉMONSTRATION — Politique de formation professionnelle
+
+Les employés peuvent bénéficier de formations destinées à développer leurs compétences professionnelles.
+
+Une demande de formation doit préciser :
+- l'intitulé de la formation ;
+- l'organisme de formation ;
+- la durée ;
+- les objectifs recherchés ;
+- le lien avec les missions du poste.
+
+La participation à une formation est soumise à la validation du manager et, lorsque nécessaire, du service des ressources humaines.
+
+Les formations prioritaires sont celles directement liées aux besoins du poste, à l'évolution des compétences et aux priorités de l'organisation.
+
+À la fin de la formation, l'employé peut être invité à fournir une attestation de participation et un retour d'expérience.
+
+Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.

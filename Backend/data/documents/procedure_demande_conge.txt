@@ -1,0 +1,22 @@
+DOCUMENT DE DÉMONSTRATION — Procédure de demande de congé
+
+La procédure de demande de congé suit les étapes suivantes :
+
+1. L'employé se connecte au portail RH.
+2. Il ouvre la rubrique « Demande de congé ».
+3. Il renseigne son identifiant employé.
+4. Il sélectionne le type de congé.
+5. Il indique la date de début et la date de fin.
+6. Il renseigne le motif de la demande.
+7. Il soumet la demande.
+8. La demande reçoit le statut « En attente ».
+9. Le manager reçoit une notification par email.
+10. Le manager peut accepter ou refuser la demande.
+11. Après la décision du manager, l'employé reçoit une notification.
+12. Le nouveau statut est visible dans la rubrique « Mes demandes ».
+
+Une demande acceptée prend le statut « accepted ».
+Une demande refusée prend le statut « rejected ».
+Une demande en cours de traitement conserve le statut « pending ».
+
+Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.

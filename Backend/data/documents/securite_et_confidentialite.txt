@@ -1,0 +1,17 @@
+DOCUMENT DE DÉMONSTRATION — Règles de sécurité et de confidentialité
+
+Tout employé doit protéger les informations auxquelles il accède dans le cadre de ses fonctions.
+
+Les identifiants et mots de passe sont strictement personnels et ne doivent jamais être partagés.
+
+Il est interdit de transmettre des informations confidentielles à des personnes non autorisées.
+
+Les documents sensibles doivent être stockés uniquement dans les espaces professionnels autorisés.
+
+L'accès aux informations doit respecter le principe du besoin d'en connaître et les habilitations attribuées à l'utilisateur.
+
+Toute suspicion de fuite de données, d'accès non autorisé ou d'incident de sécurité doit être signalée au responsable compétent.
+
+Les utilisateurs doivent verrouiller leur session lorsqu'ils quittent leur poste de travail.
+
+Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.

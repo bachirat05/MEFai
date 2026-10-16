@@ -1,0 +1,17 @@
+DOCUMENT DE DÉMONSTRATION — Politique des congés annuels
+
+Tout employé à temps plein bénéficie de 25 jours ouvrables de congé annuel par année de travail.
+
+Les droits à congé sont acquis progressivement au cours de l'année.
+
+Toute demande de congé annuel doit être introduite au moins 15 jours ouvrables avant la date souhaitée de départ, sauf accord exceptionnel du manager.
+
+La demande doit être soumise via le portail RH et validée par le manager hiérarchique.
+
+Le manager peut accepter ou refuser la demande en fonction des contraintes de service.
+
+En cas de refus, le motif de la décision doit être communiqué à l'employé.
+
+L'employé peut consulter le statut de sa demande dans la rubrique « Mes demandes ».
+
+Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.

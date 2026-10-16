@@ -1,0 +1,336 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 21
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -784,
+        96
+      ],
+      "id": "a298d616-a544-4990-bfe3-4f0456478fd1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://www.sgg.gov.ma/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -576,
+        32
+      ],
+      "id": "774fc536-704b-4ffe-a49f-3ea52228678b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $input.first().json.data;\n\nconst baseUrl = 'https://www.sgg.gov.ma/';\n\nconst pdfLinks = [];\nconst regex = /href=[\"']([^\"']+\\.pdf(?:\\?[^\"']*)?)[\"']/gi;\n\nlet match;\n\nwhile ((match = regex.exec(html)) !== null) {\n  let url = match[1];\n\n  // Transformer les liens relatifs en URL absolue\n  if (url.startsWith('/')) {\n    url = baseUrl + url;\n  } else if (!url.startsWith('http')) {\n    url = baseUrl + '/' + url;\n  }\n\n  // Éviter les doublons\n  if (!pdfLinks.includes(url)) {\n    pdfLinks.push(url);\n  }\n}\n\nreturn pdfLinks.map(url => ({\n  json: {\n    url: url,\n    source: 'sgg.gov.ma'\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        -32
+      ],
+      "id": "5d0be601-7e8a-44d4-b844-c73e59c26c6e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -176,
+        -96
+      ],
+      "id": "f31c1bb5-adc8-4d7e-a2f2-e9210496ac93",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "cortex_documents",
+        "columns": {
+          "column": [
+            {
+              "name": "URL"
+            },
+            {
+              "name": "source"
+            },
+            {
+              "name": "indexed_at",
+              "type": "date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        272
+      ],
+      "id": "e35c800a-a96b-45a1-b32c-d3fdc6e7d132",
+      "name": "Create a data table"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        -160
+      ],
+      "id": "9672e801-b832-44c3-9ed3-4a6581a3e519",
+      "name": "Download PDF"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "5y6jOOwOSjvIyDuS",
+          "mode": "list",
+          "cachedResultName": "cortex_documents",
+          "cachedResultUrl": "/projects/MFcnRkHWtniQepuH/datatables/5y6jOOwOSjvIyDuS"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "URL": "={{ $json.url }}",
+            "source": "={{ $json.source }}",
+            "indexed_at": "2026-08-15T22:10:58"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "indexed_at",
+              "displayName": "indexed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        304,
+        48
+      ],
+      "id": "c03cfff2-1f56-44fa-822d-4047e7bc2997",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/documents/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-SECRET",
+              "value": "h_IYN1RMtVf4ayPvIToVN4xGtjCqPTVDvDje3pgqQDM"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 600000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        464,
+        -160
+      ],
+      "id": "38e55311-be95-4a6e-acb8-aadbadf65285",
+      "name": "upload file"
+    },
+    {
+      "parameters": {
+        "operation": "rowNotExists",
+        "dataTableId": {
+          "__rl": true,
+          "value": "pHe3yg7wFxvYZRg2",
+          "mode": "list",
+          "cachedResultName": "cortex_documents",
+          "cachedResultUrl": "/projects/yXZag7RslzSJj60b/datatables/pHe3yg7wFxvYZRg2"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "URL",
+              "keyValue": "={{ $json.url }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        -128
+      ],
+      "id": "fedbba8b-f7fa-4e8c-8ca3-11d08aa40595",
+      "name": "If row does not exist"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If row does not exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download PDF": {
+      "main": [
+        [
+          {
+            "node": "upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If row does not exist": {
+      "main": [
+        [
+          {
+            "node": "Download PDF",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "240c09fd-4f95-47ba-8a64-1ff9eb85042d",
+  "meta": {
+    "instanceId": "d5836d103f3b2a787838a5ad5f3c82f36331432b7b4f2e1dc3c80c1f0d559b8c"
+  },
+  "nodeGroups": [],
+  "id": "8GlQTy0B4kPfl2pF",
+  "tags": []
+}

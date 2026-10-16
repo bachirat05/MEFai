@@ -1,0 +1,18 @@
+DOCUMENT DE DÉMONSTRATION — Parcours d'intégration d'un nouvel employé
+
+Lors de son arrivée, le nouvel employé reçoit les informations nécessaires concernant son poste, son équipe et son environnement de travail.
+
+Le parcours d'intégration comprend notamment :
+- la création des accès informatiques ;
+- la présentation de l'organisation ;
+- la remise des équipements professionnels ;
+- la présentation des politiques RH ;
+- la sensibilisation à la sécurité de l'information ;
+- la présentation des procédures internes ;
+- un point de suivi avec le manager.
+
+Les accès informatiques doivent être accordés uniquement selon les besoins liés au poste et le principe du moindre privilège.
+
+Le manager organise un point de suivi durant la période d'intégration afin de vérifier que l'employé dispose des informations et moyens nécessaires.
+
+Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.

@@ -1,0 +1,15 @@
+DOCUMENT DE DÉMONSTRATION — Politique de télétravail
+
+Le télétravail peut être autorisé jusqu'à trois jours par semaine selon les besoins du service et après validation du manager.
+
+L'employé doit rester joignable pendant les horaires de travail définis par son service.
+
+Les équipements professionnels fournis doivent être utilisés conformément aux règles internes de sécurité.
+
+Les documents confidentiels ne doivent pas être stockés sur des équipements personnels ou des services cloud non autorisés.
+
+L'accès aux applications internes doit respecter les règles d'authentification et d'habilitation définies par le service informatique.
+
+Tout incident de sécurité constaté pendant une période de télétravail doit être signalé sans délai au service compétent.
+
+Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.

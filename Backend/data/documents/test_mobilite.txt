@@ -1,0 +1,21 @@
+POLITIQUE INTERNE DE MOBILITÉ — DOCUMENT DE TEST
+
+Ce document est utilisé uniquement pour tester le système RAG Cortex AI.
+
+1. Délai de traitement
+Une demande de mobilité interne est traitée dans un délai maximum de 17 jours ouvrés.
+
+2. Ancienneté minimale
+L'employé doit avoir au moins 9 mois d'ancienneté avant de déposer une demande de mobilité interne.
+
+3. Validation
+La demande doit être validée successivement par le manager actuel puis par le service RH.
+
+4. Nombre de demandes
+Un employé peut soumettre au maximum 2 demandes de mobilité interne par année civile.
+
+5. Code de référence
+Le code de référence de cette politique est MOB-TEST-917.
+
+6. Prime fictive
+Lorsqu'une mobilité implique un changement de ville, une indemnité fictive de 1 850 MAD peut être accordée dans le cadre de ce test.

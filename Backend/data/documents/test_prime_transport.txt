@@ -1,0 +1,5 @@
+Document de démonstration Cortex AI.
+
+La prime de transport fictive pour les tests est de 777 dirhams par mois.
+
+Cette information est destinée uniquement aux tests du système RAG.

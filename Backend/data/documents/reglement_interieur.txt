@@ -1,0 +1,13 @@
+DOCUMENT DE DÉMONSTRATION — Règlement intérieur simplifié
+
+Chaque employé doit respecter les horaires, procédures internes et règles de sécurité applicables dans son environnement de travail.
+
+L'utilisation des ressources informatiques doit rester conforme aux besoins professionnels.
+
+Les comportements portant atteinte à la confidentialité, à la sécurité des systèmes ou au respect des autres collaborateurs peuvent faire l'objet d'un signalement.
+
+Tout employé doit respecter les règles d'accès aux locaux, aux applications et aux informations en fonction de ses habilitations.
+
+Les procédures RH et administratives doivent être suivies via les canaux officiels prévus par l'organisation.
+
+Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.

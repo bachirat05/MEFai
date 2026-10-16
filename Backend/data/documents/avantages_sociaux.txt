@@ -1,0 +1,14 @@
+DOCUMENT DE DÉMONSTRATION — Avantages sociaux
+
+Les avantages sociaux peuvent inclure, selon les règles internes applicables :
+- une couverture médicale ;
+- des dispositifs d'accompagnement social ;
+- des actions de bien-être au travail ;
+- des aides ou prestations spécifiques ;
+- des activités sociales et culturelles.
+
+L'accès à un avantage peut dépendre de critères tels que l'ancienneté, la situation administrative ou l'éligibilité définie par le service des ressources humaines.
+
+Toute demande relative à un avantage social doit être adressée au service RH via le canal prévu à cet effet.
+
+Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.

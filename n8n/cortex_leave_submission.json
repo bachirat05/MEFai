@@ -1,0 +1,224 @@
+{
+  "name": "Cortex AI - Leave Submission",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "conge-test",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c1d0632c-09e6-4ac8-a633-fb4846f633c5",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const demande = $json.body;\n\nconst requiredFields = [\n  \"employe_id\",\n  \"date_debut\",\n  \"date_fin\",\n  \"type_conge\",\n  \"motif\",\n];\n\nconst missing = requiredFields.filter(\n  (field) =>\n    demande[field] === undefined ||\n    demande[field] === null ||\n    String(demande[field]).trim() === \"\"\n);\n\nif (missing.length > 0) {\n  return [\n    {\n      json: {\n        statut: \"rejetee\",\n        message: \"La demande est incomplète.\",\n        champs_manquants: missing,\n      },\n    },\n  ];\n}\n\nconst start = new Date(demande.date_debut);\nconst end = new Date(demande.date_fin);\n\nif (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {\n  return [\n    {\n      json: {\n        statut: \"rejetee\",\n        message: \"Les dates fournies sont invalides.\",\n      },\n    },\n  ];\n}\n\nif (end < start) {\n  return [\n    {\n      json: {\n        statut: \"rejetee\",\n        message: \"La date de fin doit être postérieure ou égale à la date de début.\",\n      },\n    },\n  ];\n}\n\nreturn [\n  {\n    json: {\n      ...demande,\n      statut: \"en_attente\",\n      demande_id: `REQ-${Date.now()}`,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "1fb75fbb-35cd-44eb-b1d4-f5e449b19d9e",
+      "name": "Valider demande de congé"
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-smtp-sender@example.com",
+        "toEmail": "={{$json.manager_email}}",
+        "subject": "=[Cortex AI] Nouvelle demande de congé — {{$json.demande_id}}",
+        "html": "=<div style=\"font-family: Arial, sans-serif; background:#f8fafc; padding:32px;\">\n  <div style=\"max-width:640px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius:16px; overflow:hidden;\">\n\n    <div style=\"padding:24px 28px; border-bottom:1px solid #e5e7eb;\">\n      <div style=\"font-size:13px; color:#7c3aed; font-weight:700; letter-spacing:.04em;\">\n        CORTEX AI · RH\n      </div>\n\n      <h2 style=\"margin:8px 0 6px; color:#111827; font-size:24px;\">\n        Nouvelle demande de congé\n      </h2>\n\n      <p style=\"margin:0; color:#6b7280; font-size:14px;\">\n        Une nouvelle demande nécessite votre validation.\n      </p>\n    </div>\n\n    <div style=\"padding:28px;\">\n\n      <div style=\"background:#f5f3ff; border:1px solid #ede9fe; border-radius:12px; padding:16px 18px; margin-bottom:24px;\">\n        <div style=\"font-size:12px; color:#6d28d9; font-weight:700;\">\n          RÉFÉRENCE\n        </div>\n        <div style=\"font-size:18px; color:#111827; font-weight:700; margin-top:4px;\">\n          {{$json.demande_id}}\n        </div>\n      </div>\n\n      <table style=\"width:100%; border-collapse:collapse; font-size:14px;\">\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Employé</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.employe_id}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Type de congé</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.type_conge}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Date de début</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.date_debut}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Date de fin</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.date_fin}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Motif</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.motif}}\n          </td>\n        </tr>\n      </table>\n\n      <div style=\"margin-top:24px; padding:14px 16px; background:#fff7ed; border:1px solid #fed7aa; border-radius:10px;\">\n        <span style=\"color:#9a3412; font-size:13px; font-weight:700;\">\n          Statut : En attente de validation\n        </span>\n      </div>\n\n      <p style=\"margin:24px 0 0; color:#6b7280; font-size:13px; line-height:1.6;\">\n        Connectez-vous à l’Espace Manager Cortex AI pour consulter la demande et prendre une décision.\n      </p>\n\n    </div>\n\n    <div style=\"padding:18px 28px; background:#f9fafb; border-top:1px solid #e5e7eb; color:#9ca3af; font-size:12px;\">\n      Notification automatique générée par Cortex AI · Assistant RH intelligent\n    </div>\n\n  </div>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "34596109-8559-4ab5-895b-6528288ac505",
+      "name": "Send an Email"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0ec48725-64fd-4ecc-a370-5da3108d7ae4",
+              "leftValue": "={{$json.statut}}",
+              "rightValue": "en_attente",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "51bdfe07-fed7-4583-bf3a-d34fb6fc3b99",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "=={{\n  {\n    statut: $json.statut,\n    message: $json.message,\n    champs_manquants: $json.champs_manquants ?? []\n  }\n}}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        208
+      ],
+      "id": "6ae7e678-6192-447c-8c5c-61845b25df66",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "c2ecf659-e7b3-4df6-9695-a26942371ee0",
+      "name": "Valider demande de congé2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c98782c5-1062-4b6f-882b-4afdc1b43759",
+              "name": "=demande_id",
+              "value": "={{$('Valider demande de congé').item.json.demande_id}}",
+              "type": "string"
+            },
+            {
+              "id": "fadf1ad5-463c-4cac-a779-c000e91a0c4b",
+              "name": "=statut",
+              "value": "{{$('Valider demande de congé').item.json.statut}",
+              "type": "string"
+            },
+            {
+              "id": "d6172eb3-8b70-4a8f-aefe-7c46348db76f",
+              "name": "message",
+              "value": "Demande transmise au manager avec succès.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        896,
+        0
+      ],
+      "id": "42910dbf-f5b1-4ad6-88b7-c10fd5fd9d32",
+      "name": "Préparer réponse"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Valider demande de congé",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valider demande de congé": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "Préparer réponse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Préparer réponse": {
+      "main": [
+        [
+          {
+            "node": "Valider demande de congé2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "nodeGroups": [],
+  "tags": []
+}

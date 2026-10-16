@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment files
+.env
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ChromaDB
+chroma_db/
+
+# PDFs (generated)
+*.pdf
+
+# Test cache
+.pytest_cache/
+*.pytest_cache
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Firebase credentials
+firebase_admin_key.json
+
+*.db

@@ -1,0 +1,30 @@
+POLITIQUE INTERNE D'ÉQUIPEMENT INFORMATIQUE — DOCUMENT DE TEST
+
+Ce document est utilisé uniquement pour tester le système RAG Cortex AI.
+
+1. Attribution du matériel
+Chaque nouvel employé reçoit un ordinateur portable professionnel lors de son intégration.
+
+2. Durée de renouvellement
+Le renouvellement standard d'un ordinateur portable est prévu tous les 4 ans.
+
+3. Écran supplémentaire
+Un écran externe peut être attribué aux employés dont le poste nécessite un travail prolongé sur plusieurs applications.
+
+4. Montant maximal
+Pour l'achat d'un accessoire professionnel autorisé, le montant maximal remboursable est fixé à 950 MAD.
+
+5. Procédure de panne
+En cas de panne du matériel professionnel, l'employé doit signaler l'incident au support informatique dans un délai maximum de 24 heures.
+
+6. Perte ou vol
+En cas de perte ou de vol d'un équipement professionnel, l'employé doit informer immédiatement son manager et le service informatique.
+
+7. Code de référence
+Le code de référence de cette politique de test est IT-EQP-2026-44.
+
+8. Matériel personnel
+L'utilisation d'un ordinateur personnel pour stocker des documents professionnels confidentiels est interdite.
+
+9. Priorité de remplacement
+Le remplacement du matériel est prioritaire lorsque l'équipement empêche l'employé d'exercer normalement ses fonctions.
