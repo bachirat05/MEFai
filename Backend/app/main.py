@@ -35,6 +35,8 @@ from api.routes.conges import router as conges_router
 from api.routes.documents import router as documents_router
 from api.routes.system import router as system_router
 
+from sqlite.init_db import initialize_database
+
 from services.audit.activity_log_service import ensure_activity_log_indexes
 
 # Import du serveur MCP et de sa fonction de connexion aux services.
@@ -165,12 +167,9 @@ app = FastAPI(
 
 
 # =========================================================
-# DATABASE TABLES
+# DATABASE TABLES : initialisation
 # =========================================================
-
-Base.metadata.create_all(bind=engine)
-ensure_activity_log_indexes(engine)
-
+initialize_database()
 
 # =========================================================
 # CORS
