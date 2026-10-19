@@ -3,9 +3,6 @@ from __future__ import annotations
 from schemas.document import DocumentSearchQuery
 from services.rag.retriever import Retriever
 
-# NOTE: nouveau fichier (il n'existait pas dans ton code).
-# Adapte le client LLM à celui que tu utilises déjà.
-
 PROMPT = """Tu es un assistant RH. Réponds uniquement à partir du contexte ci-dessous.
 Si l'information n'y est pas, dis-le clairement.
 

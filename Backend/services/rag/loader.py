@@ -1,5 +1,3 @@
-"""Lecture des fichiers sources (.txt, .pdf, .docx) en texte brut."""
-
 from __future__ import annotations
 
 import unicodedata

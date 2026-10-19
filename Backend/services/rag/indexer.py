@@ -1,10 +1,7 @@
 from __future__ import annotations
-
 import logging
 from pathlib import Path
-
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
 from schemas.document import (
     DocumentCategory,
     DocumentIngestion,

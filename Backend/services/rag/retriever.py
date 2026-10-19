@@ -1,9 +1,3 @@
-"""Recherche : vectorielle (RAGService) puis reranking lexical.
-
-Le reranking favorise les chunks qui contiennent les valeurs recherchées
-(montants, durées, codes...) en plus de la similarité vectorielle.
-"""
-
 from __future__ import annotations
 
 import logging
