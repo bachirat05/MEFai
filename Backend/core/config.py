@@ -22,10 +22,12 @@ class Settings(BaseSettings):
 
     n8n_webhook_url: str = ""
 
+
     # Webhooks spécifiques par workflow
     n8n_webhook_conge_url: str = ""
     n8n_status_notification_webhook_url: str = ""
     n8n_webhook_document_url: str = ""
+
 
     n8n_secret_token: str = ""
     n8n_timeout_seconds: float = 15.0
@@ -51,4 +53,6 @@ class Settings(BaseSettings):
 
 
 def get_settings() -> Settings:
+
     return Settings()
+

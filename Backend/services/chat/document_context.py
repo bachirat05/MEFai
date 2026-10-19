@@ -19,13 +19,12 @@ from Backend.services.mcp.mcp_client import (
     normalize_search_documents_arguments,
 )
 
-from chat.question_analyzer import (is_document_question, infer_document_category)
-from chat.conversation_context import build_contextual_search_query
+from services.chat.question_analyzer import (is_document_question, infer_document_category)
+from services.chat.conversation_context import build_contextual_search_query
 
 logger = logging.getLogger(__name__)
 
 def find_search_documents_tool(
-        self,
         tools: list[StructuredTool],
     ) -> StructuredTool | None:
         for tool in tools:
@@ -35,7 +34,6 @@ def find_search_documents_tool(
         return None
 
 async def preload_document_context(
-        self,
         message: str,
         tools: list[StructuredTool],
         history: list[dict[str, str]] | None = None,
@@ -45,7 +43,7 @@ async def preload_document_context(
         ):
             return None, None
 
-        search_tool = self._find_search_documents_tool(
+        search_tool = find_search_documents_tool(
             tools
         )
 
@@ -92,5 +90,6 @@ async def preload_document_context(
             len(str(context)),
             str(context)[:1200],
         )
+
 
         return str(context), search_args

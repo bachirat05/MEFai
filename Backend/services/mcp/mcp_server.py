@@ -6,6 +6,7 @@ import re
 import unicodedata
 
 from mcp.server import MCPServer
+from services.rag.retriever import lexical_tokens, rerank
 
 from Backend.sqlite.database import SessionLocal
 from core.config import get_settings
@@ -115,123 +116,6 @@ def rank_process_results(query: str, results):
         reverse=True,
     )
 
-
-def normalize_for_lexical_match(value: str) -> str:
-    return (
-        unicodedata.normalize("NFKD", value)
-        .encode("ascii", "ignore")
-        .decode("ascii")
-        .lower()
-    )
-
-
-def lexical_tokens(value: str) -> set[str]:
-    stop_words = {
-        "avec", "dans", "des", "du", "elle", "est", "les", "leur",
-        "pour", "que", "quel", "quelle", "quels", "quelles", "qui",
-        "une", "un", "sur", "par", "de", "la", "le", "l", "d", "a",
-        "au", "aux", "ce", "ces", "se", "sa", "son",
-    }
-    tokens = set(re.findall(r"[a-z0-9]{3,}", normalize_for_lexical_match(value)))
-    return {token for token in tokens if token not in stop_words}
-
-
-PRECISION_MARKERS = {
-    "code", "reference", "identifiant", "montant", "indemnite", "prime",
-    "plafond", "maximum", "mad", "jours", "mois", "pourcentage", "date",
-    "duree", "limite", "ville", "ordinateur", "professionnel",
-    "professionnelle", "accessoire", "informatique", "equipement",
-    "materiel", "panne", "incident", "support", "vol", "perte",
-    "renouvellement", "renouvele", "remboursable", "signaler",
-}
-
-LEXICAL_EQUIVALENTS = {
-    "annees": {"ans", "annee", "annees"},
-    "ans": {"ans", "annee", "annees"},
-    "renouvele": {"renouvele", "renouvellement", "renouveler"},
-    "renouvellement": {"renouvele", "renouvellement", "renouveler"},
-    "professionnel": {"professionnel", "professionnelle", "professionnels"},
-    "professionnelle": {"professionnel", "professionnelle", "professionnels"},
-    "equipement": {"equipement", "materiel", "ordinateur"},
-    "materiel": {"equipement", "materiel", "ordinateur"},
-    "ordinateur": {"ordinateur", "portable", "materiel", "equipement"},
-    "panne": {"panne", "incident", "support"},
-    "vol": {"vol", "perte"},
-    "perte": {"vol", "perte"},
-    "montant": {"montant", "plafond", "maximum", "remboursable"},
-}
-
-
-def expand_tokens(tokens: set[str]) -> set[str]:
-    expanded = set(tokens)
-    for token in tokens:
-        expanded.update(LEXICAL_EQUIVALENTS.get(token, set()))
-    return expanded
-
-
-def precision_value_patterns(value: str) -> set[str]:
-    normalized = normalize_for_lexical_match(value)
-    patterns: set[str] = set()
-
-    if re.search(r"\b[A-Z0-9]{2,}(?:-[A-Z0-9]{2,})+\b", value):
-        patterns.add("code_like")
-    if re.search(r"\b\d[\d\s.,]*\s*(?:mad|dh|dirhams?|%)\b", normalized):
-        patterns.add("money_or_percent")
-    if re.search(r"\b\d+\s*(?:jours?|mois|annees?|ans)\b", normalized):
-        patterns.add("duration")
-    if re.search(r"\b\d+\b", normalized):
-        patterns.add("number")
-
-    return patterns
-
-
-def rerank_document_results(query: str, results):
-    query_tokens = expand_tokens(lexical_tokens(query))
-    query_precision_markers = query_tokens & PRECISION_MARKERS
-    query_patterns = precision_value_patterns(query)
-
-    def rank_key(result):
-        content_tokens = expand_tokens(lexical_tokens(result.content))
-        metadata_text = " ".join([
-            result.metadata.filename or "",
-            result.metadata.document_type or "",
-            " ".join(result.metadata.tags),
-        ])
-        metadata_tokens = expand_tokens(lexical_tokens(metadata_text))
-        lexical_overlap = len(query_tokens & (content_tokens | metadata_tokens))
-        content_patterns = precision_value_patterns(result.content)
-        precision_overlap = len(query_precision_markers & content_tokens)
-        inferred_precision = 0
-
-        if query_precision_markers and content_patterns:
-            inferred_precision += 1
-        if "montant" in query_precision_markers and (
-            "money_or_percent" in content_patterns or "mad" in content_tokens
-        ):
-            inferred_precision += 3
-        if (
-            {"code", "reference", "identifiant"} & query_precision_markers
-            and "code_like" in content_patterns
-        ):
-            inferred_precision += 3
-        if (
-            {"jours", "mois", "duree"} & query_precision_markers
-            and "duration" in content_patterns
-        ):
-            inferred_precision += 2
-        if query_patterns and query_patterns & content_patterns:
-            inferred_precision += 2
-
-        return (
-            inferred_precision,
-            precision_overlap,
-            lexical_overlap,
-            result.score,
-        )
-
-    return sorted(results, key=rank_key, reverse=True)
-
-
 def has_lexical_overlap(query: str, results) -> bool:
     query_tokens = lexical_tokens(query)
     if not query_tokens:
@@ -318,7 +202,7 @@ async def search_documents(
     )
 
     try:
-        response = rag_service.search(search_query)
+        response = rag_service.vector_search(search_query)
 
         logger.info(
             "search_documents raw results | query=%r | category=%r | results=%s",
@@ -336,7 +220,7 @@ async def search_documents(
                 top_k=candidate_top_k,
                 similarity_threshold=effective_threshold,
             )
-            response = rag_service.search(search_query)
+            response = rag_service.vector_search(search_query)
 
             logger.info(
                 "search_documents fallback raw results | query=%r | category=%r | results=%s",
@@ -354,7 +238,7 @@ async def search_documents(
                 top_k=candidate_top_k,
                 similarity_threshold=effective_threshold,
             )
-            global_response = rag_service.search(global_query)
+            global_response = rag_service.vector_search(global_query)
             logger.info(
                 "search_documents global fallback raw results | query=%r | results=%s",
                 query, describe_search_results(global_response),
@@ -371,8 +255,7 @@ async def search_documents(
             )
 
         if response and not process_reranked:
-            response = rerank_document_results(query, response)
-            response = response[:effective_top_k]
+            response = rerank(query, response, effective_top_k)
 
         if not response:
             return (
@@ -487,4 +370,6 @@ async def soumettre_demande_conge(
         return f"Error: n8n workflow failed — {exc}"
     except Exception as exc:
         logger.error("Unexpected error submitting leave request: %s", exc)
+
         return f"Error: unexpected failure — {exc}"
+

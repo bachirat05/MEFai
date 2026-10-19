@@ -15,7 +15,9 @@ from app import firebase_auth
 from app.firebase_auth import ManagerResolutionError
 from app.main import app
 from Backend.sqlite.database import Base, get_db
+
 from Backend.sqlite.leave_models import LeaveRequestModel
+
 from schemas.workflow import DemandeConge, TypeConge
 from services.workflows import leave_submission_service
 from services.workflows.leave_submission_service import (

@@ -186,7 +186,9 @@ function Sidebar({
           {!isCollapsed ? (
           <div>
             <h1 className="text-lg font-semibold leading-tight text-slate-950">
-              Cortex AI
+
+              MEFai
+
             </h1>
             <p className="text-xs font-medium text-slate-500">
               Ministere
@@ -291,7 +293,9 @@ function Sidebar({
         <div className="mb-3 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
           <div>
             <p className="text-xs font-semibold text-slate-700">
-              Cortex AI v1.2.0
+
+              MEFai v1.2.0
+
             </p>
             <p className="mt-0.5 text-xs text-slate-400">
               Statut operationnel

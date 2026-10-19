@@ -85,7 +85,6 @@ def _extract_token(
 
     return token
 
-
 async def verify_firebase_token(
     credentials: HTTPAuthorizationCredentials | str | None = Security(
         firebase_bearer

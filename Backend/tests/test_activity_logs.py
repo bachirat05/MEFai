@@ -11,7 +11,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
+
 from Backend.sqlite.activity_models import ActivityLogModel
+
 from app.firebase_auth import auth
 from app.main import app
 from Backend.sqlite.database import Base, get_db

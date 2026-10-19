@@ -1,18 +1,20 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth"; 
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+import { getAuth } from "firebase/auth";
+
 const firebaseConfig = {
-  apiKey: "AIzaSyAgmUxS8foF7tsytvV9b2g0z0cZ_HWL5aM",
-  authDomain: "mefai-9de25.firebaseapp.com",
-  projectId: "mefai-9de25",
-  storageBucket: "mefai-9de25.firebasestorage.app",
-  messagingSenderId: "1026406474174",
-  appId: "1:1026406474174:web:0b834d37ac101de7b319ef",
-  measurementId: "G-JLHX9Y07PW"
+  apiKey: "AIzaSyCn30tTlWFJSTA3xJnPuMxinAJn6NmLkcg",
+  authDomain: "cortex-ai-a9079.firebaseapp.com",
+  projectId: "cortex-ai-a9079",
+  storageBucket: "cortex-ai-a9079.firebasestorage.app",
+  messagingSenderId: "886288696897",
+  appId: "1:886288696897:web:587f0ec0e417bee33f28c0",
+  measurementId: "G-Y4LQYSQ4L2"
+
 };
 
+
 const app = initializeApp(firebaseConfig);
+
+
 export const auth = getAuth(app);

@@ -43,7 +43,9 @@ const pageCopy: Record<
 > = {
   dashboard: {
     title: "Tableau de bord",
-    description: "Vue d'ensemble de Cortex AI",
+
+    description: "Vue d'ensemble de MEFai ",
+
   },
   chat: {
     title: "Chat IA",
@@ -63,7 +65,9 @@ const pageCopy: Record<
   },
   admin: {
     title: "Administration",
-    description: "Supervision de Cortex AI",
+
+    description: "Supervision de MEFai ",
+
   },
   documents: {
     title: "Documents",

@@ -500,3 +500,4 @@ async def delete_document(
         "name": file_path.name,
         "chunks_deleted": len(deleted_ids),
     }
+

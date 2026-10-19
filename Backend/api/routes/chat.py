@@ -23,7 +23,9 @@ from services.audit.activity_log_service import (
     safe_log_activity,
 )
 from services.chat.chat_service import chat_service
+
 from Backend.services.mcp.mcp_client import MCPClient
+
 
 
 logger = logging.getLogger(__name__)

@@ -3,7 +3,6 @@ from __future__ import annotations
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-
 DATABASE_URL = "sqlite:///./MEFai.db"
 
 
@@ -13,6 +12,7 @@ engine = create_engine(
         "check_same_thread": False,
     },
 )
+
 
 
 SessionLocal = sessionmaker(

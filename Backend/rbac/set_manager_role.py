@@ -23,7 +23,9 @@ if not firebase_admin._apps:
     )
 
 
-EMAIL = "bachirat.salma@etu.uae.ac.ma"
+
+EMAIL = "amadjouj.manar@etu.uae.ac.ma"
+
 
 
 user = auth.get_user_by_email(

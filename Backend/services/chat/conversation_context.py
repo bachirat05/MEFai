@@ -7,7 +7,7 @@ import logging
 import re
 from typing import Any
 
-from chat.question_analyzer import (
+from services.chat.question_analyzer import (
     is_document_question,
     extract_search_subject,
 )
@@ -29,7 +29,6 @@ FOLLOW_UP_MARKERS = (
 )
 
 def is_follow_up_question(
-        self,
         message: str,
     ) -> bool:
         normalized = message.lower()
@@ -40,7 +39,6 @@ def is_follow_up_question(
 
 # utilise l'historique pour construire une requête enrichie
 def build_contextual_search_query(
-        self,
         message: str,
         history: list[dict[str, str]] | None,
     ) -> str:
@@ -108,4 +106,6 @@ def build_contextual_search_query(
             f"{message}\n\n"
             "Contexte conversationnel récent: "
             f"{context}"
+
         )
+

@@ -7,13 +7,59 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document as LCDocument
 from langchain_core.embeddings import Embeddings
 
-from schemas.document import DocumentCategory, DocumentIngestion, DocumentMetadata, DocumentSearchQuery, DocumentSearchResult, DocumentSource
+from schemas.document import (
+    DocumentCategory,
+    DocumentIngestion,
+    DocumentMetadata,
+    DocumentSearchQuery,
+    DocumentSearchResult,
+    DocumentSource,
+)
 
 logger = logging.getLogger(__name__)
 
-# ChromaDB HNSW index configuration: force Cosine distance so that
-# similarity_search_with_score returns cosine distances in [0, 2].
+# Distance cosinus : similarity_search_with_score renvoie des distances dans [0, 2].
 _COLLECTION_METADATA = {"hnsw:space": "cosine"}
+
+# Nombre minimum de candidats remontés avant reranking.
+CANDIDATE_POOL = 30
+
+
+# Conversion Pydantic <-> dict stocké dans Chroma.
+# Chroma n'accepte pas None : on stocke "" ou 0 et on restaure None à la lecture.
+
+
+def _to_chroma(meta: DocumentMetadata, document_id: str) -> dict:
+    return {
+        "document_id": document_id,
+        "category": meta.category.value,
+        "source": meta.source.value,
+        "department": meta.department,
+        "tags": meta.tags,
+        "filename": meta.filename or "",
+        "document_type": meta.document_type or "",
+        "chunk_index": meta.chunk_index or 0,
+        "chunk_count": meta.chunk_count or 0,
+        "effective_date": meta.effective_date or "",
+        "author": meta.author or "",
+        "version": meta.version,
+    }
+
+
+def _from_chroma(raw: dict) -> DocumentMetadata:
+    return DocumentMetadata(
+        category=DocumentCategory(raw.get("category", DocumentCategory.OTHER.value)),
+        source=DocumentSource(raw.get("source", DocumentSource.MANUAL.value)),
+        department=raw.get("department", ""),
+        tags=raw.get("tags", []),
+        filename=raw.get("filename") or None,
+        document_type=raw.get("document_type") or None,
+        chunk_index=raw.get("chunk_index") or None,
+        chunk_count=raw.get("chunk_count") or None,
+        effective_date=raw.get("effective_date") or None,
+        author=raw.get("author") or None,
+        version=raw.get("version", "1.0.0"),
+    )
 
 
 class RAGServiceError(Exception):
@@ -37,13 +83,20 @@ class RAGRetrievalError(RAGServiceError):
 
 
 class RAGService:
-    def __init__(self, embedding_function: Embeddings, persist_directory: str = "./chroma_db", collection_name: str = "rh_documents") -> None:
+    def __init__(
+        self,
+        embedding_function: Embeddings,
+        persist_directory: str = "./chroma_db",
+        collection_name: str = "rh_documents",
+    ) -> None:
         self._embedding_function = embedding_function
         self._persist_directory = persist_directory
         self._collection_name = collection_name
         self._vectorstore: Chroma | None = None
-        self._initialized = False
-        logger.info("RAGService instantiated for collection '%s' at '%s'", collection_name, persist_directory)
+
+    # ------------------------------------------------------------------
+    # Cycle de vie
+    # ------------------------------------------------------------------
 
     def initialize(self) -> None:
         try:
@@ -53,258 +106,161 @@ class RAGService:
                 collection_name=self._collection_name,
                 collection_metadata=_COLLECTION_METADATA,
             )
-            self._initialized = True
-            logger.info("RAGService initialized — ChromaDB collection '%s' ready (space=cosine)", self._collection_name)
         except Exception as exc:
-            logger.error("RAG initialization failed for collection '%s': %s", self._collection_name, exc)
-            raise RAGInitializationError(f"Failed to initialize RAG collection '{self._collection_name}': {exc}") from exc
-
-    @staticmethod
-    def _compute_document_id(content: str) -> str:
-        """Deterministic MD5 of the content — stable across re-seeds."""
-        return hashlib.md5(content.encode("utf-8")).hexdigest()
-
-    @staticmethod
-    def _build_lc_document(document: DocumentIngestion, doc_id: str) -> LCDocument:
-        return LCDocument(
-            page_content=document.content,
-            id=doc_id,
-            metadata={
-                "document_id": doc_id,
-                "category": document.metadata.category.value,
-                "source": document.metadata.source.value,
-                "department": document.metadata.department,
-                "tags": document.metadata.tags,
-                "filename": document.metadata.filename or "",
-                "document_type": document.metadata.document_type or "",
-                "chunk_index": document.metadata.chunk_index or 0,
-                "chunk_count": document.metadata.chunk_count or 0,
-                "effective_date": document.metadata.effective_date or "",
-                "author": document.metadata.author or "",
-                "version": document.metadata.version,
-            },
-        )
-
-    def _upsert(self, documents: list[LCDocument], ids: list[str]) -> None:
-        """Upsert semantics on top of ChromaDB's add (no native upsert in this version).
-
-        Existing IDs are deleted first, then documents are added, so re-seeding
-        with deterministic MD5 IDs updates in place instead of duplicating.
-        """
-        existing = self._vectorstore.get(ids=ids, include=[])
-        stale_ids = existing.get("ids", [])
-        if stale_ids:
-            self._vectorstore.delete(ids=stale_ids)
-        self._vectorstore.add_documents(documents, ids=ids)
-
-    def ingest(self, document: DocumentIngestion) -> str:
-        if not self._initialized or self._vectorstore is None:
-            raise RAGInitializationError("RAGService is not initialized. Call initialize() first.")
-
-        try:
-            doc_id = self._compute_document_id(document.content)
-            self._upsert(
-                documents=[self._build_lc_document(document, doc_id)],
-                ids=[doc_id],
-            )
-            logger.info("Document ingested (upsert) — id: '%s', category: '%s'", doc_id, document.metadata.category.value)
-            return doc_id
-        except Exception as exc:
-            logger.error("Ingestion failed: %s", exc)
-            raise RAGIngestionError(f"Failed to ingest document: {exc}") from exc
-
-    def ingest_batch(self, documents: list[DocumentIngestion]) -> list[str]:
-        if not self._initialized or self._vectorstore is None:
-            raise RAGInitializationError("RAGService is not initialized. Call initialize() first.")
-
-        try:
-            lc_docs: list[LCDocument] = []
-            doc_ids: list[str] = []
-            for index, document in enumerate(documents):
-                unique_key = f"{index}:{document.content}"
-                doc_id = self._compute_document_id(
-                    unique_key)
-                doc_ids.append(doc_id)
-                lc_docs.append(
-                    self._build_lc_document(document, doc_id))
-            self._upsert(documents=lc_docs, ids=doc_ids)
-            logger.info("Batch ingestion successful (upsert) — %d documents", len(doc_ids))
-            return doc_ids
-
-        except Exception as exc:
-            logger.error("Batch ingestion failed: %s", exc)
-            raise RAGIngestionError(f"Failed to batch ingest documents: {exc}") from exc
-
-    def delete_batch(self, documents: list[DocumentIngestion]) -> list[str]:
-        if not self._initialized or self._vectorstore is None:
-            raise RAGInitializationError("RAGService is not initialized. Call initialize() first.")
-
-        try:
-            doc_ids = [
-                self._compute_document_id(document.content)
-                for document in documents
-            ]
-
-            if not doc_ids:
-                logger.info("Batch deletion skipped — no document ids provided")
-                return []
-
-            existing = self._vectorstore.get(ids=doc_ids, include=[])
-            existing_ids = existing.get("ids", [])
-
-            if existing_ids:
-                self._vectorstore.delete(ids=existing_ids)
-
-            logger.info("Batch deletion successful — %d documents", len(existing_ids))
-            return existing_ids
-
-        except Exception as exc:
-            logger.error("Batch deletion failed: %s", exc)
-            raise RAGDeletionError(f"Failed to batch delete documents: {exc}") from exc
-
-    def delete_by_tag(self, tag: str) -> list[str]:
-        if not self._initialized or self._vectorstore is None:
-            raise RAGInitializationError("RAGService is not initialized. Call initialize() first.")
-
-        try:
-            if not tag:
-                logger.info("Tag deletion skipped — empty tag")
-                return []
-
-            matching_ids: list[str] = []
-
-            try:
-                filtered = self._vectorstore.get(
-                    where={
-                        "tags": {
-                            "$contains": tag,
-                        },
-                    },
-                    include=[],
-                )
-                matching_ids = filtered.get("ids", [])
-            except Exception:
-                all_items = self._vectorstore.get(
-                    include=["metadatas"],
-                )
-                ids = all_items.get("ids", [])
-                metadatas = all_items.get("metadatas", [])
-
-                matching_ids = [
-                    doc_id
-                    for doc_id, metadata in zip(ids, metadatas)
-                    if tag in metadata.get("tags", [])
-                ]
-
-            if matching_ids:
-                self._vectorstore.delete(
-                    ids=matching_ids
-                )
-
-            logger.info(
-                "Tag deletion successful — tag='%s', chunks=%d",
-                tag,
-                len(matching_ids),
-            )
-            return matching_ids
-
-        except Exception as exc:
-            logger.error(
-                "Tag deletion failed for tag '%s': %s",
-                tag,
-                exc,
-            )
-            raise RAGDeletionError(f"Failed to delete documents by tag: {exc}") from exc
-
-    def search(self, query: DocumentSearchQuery) -> list[DocumentSearchResult]:
-        """Pure vector search (filters + similarity threshold).
-
-        Returns up to max(top_k, 30) candidates, NOT re-ranked and NOT cut to
-        top_k. Re-ranking is done by services.rag.retriever.
-        """
-        if not self._initialized or self._vectorstore is None:
-            raise RAGInitializationError("RAGService is not initialized. Call initialize() first.")
-
-        try:
-            filters: list[dict] = []
-            if query.category is not None:
-                filters.append({"category": {"$eq": query.category.value}})
-            if query.department:
-                filters.append({"department": {"$eq": query.department}})
-            if query.tags:
-                for tag in query.tags:
-                    filters.append({"tags": {"$contains": tag}})
-
-            filter_dict: dict | None = None
-            if len(filters) == 1:
-                filter_dict = filters[0]
-            elif len(filters) > 1:
-                filter_dict = {"$and": filters}
-
-            # Cosine space: ChromaDB returns cosine distance in [0, 2].
-            # Convert to true cosine similarity in [-1, 1].
-            candidate_k = max(
-                query.top_k,
-                30,
-            )
-
-            results = self._vectorstore.similarity_search_with_score(
-                query.query,
-                k=candidate_k,
-                filter=filter_dict,
-            )
-
-            search_results: list[DocumentSearchResult] = []
-            for doc, distance in results:
-                similarity = 1.0 - distance
-                if similarity < query.similarity_threshold:
-                    continue
-                meta = doc.metadata
-                metadata = DocumentMetadata(
-                    category=DocumentCategory(meta.get("category", DocumentCategory.OTHER.value)),
-                    source=DocumentSource(meta.get("source", DocumentSource.MANUAL.value)),
-                    department=meta.get("department", ""),
-                    tags=meta.get("tags", []),
-                    filename=meta.get("filename") or None,
-                    document_type=meta.get("document_type") or None,
-                    chunk_index=meta.get("chunk_index") or None,
-                    chunk_count=meta.get("chunk_count") or None,
-                    effective_date=meta.get("effective_date") or None,
-                    author=meta.get("author") or None,
-                    version=meta.get("version", "1.0.0"),
-                )
-                search_results.append(
-                    DocumentSearchResult(
-                        document_id=meta.get("document_id", ""),
-                        content=doc.page_content,
-                        metadata=metadata,
-                        score=similarity,
-                    )
-                )
-
-            logger.info(
-                "Vector search completed — query='%s…', candidates=%d",
-                query.query[:60],
-                len(search_results),
-            )
-            return search_results
-        except Exception as exc:
-            logger.error("Search failed for query '%s…': %s", query.query[:60], exc)
-            raise RAGRetrievalError(f"Search failed: {exc}") from exc
+            raise RAGInitializationError(
+                f"Impossible d'initialiser la collection '{self._collection_name}': {exc}"
+            ) from exc
+        logger.info("RAGService prêt — collection '%s' (cosine)", self._collection_name)
 
     @property
     def is_initialized(self) -> bool:
-        return self._initialized
+        return self._vectorstore is not None
+
+    def _store(self) -> Chroma:
+        if self._vectorstore is None:
+            raise RAGInitializationError("RAGService n'est pas initialisé. Appelle initialize().")
+        return self._vectorstore
+
+    # ------------------------------------------------------------------
+    # Identifiants et conversion
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _document_id(doc: DocumentIngestion) -> str:
+        """ID stable : « fichier:position_du_chunk ».
+
+        Indépendant du contenu et de l'ordre du batch, donc identique que l'on
+        indexe un fichier seul ou tout le dossier. Sans nom de fichier, on
+        retombe sur un hash du contenu.
+        """
+        meta = doc.metadata
+        if meta.filename:
+            return f"{meta.filename}:{meta.chunk_index or 0}"
+        return hashlib.md5(doc.content.encode("utf-8")).hexdigest()
+
+    def _to_lc_document(self, doc: DocumentIngestion) -> LCDocument:
+        doc_id = self._document_id(doc)
+        return LCDocument(
+            page_content=doc.content,
+            id=doc_id,
+            metadata=_to_chroma(doc.metadata, doc_id),
+        )
+
+    def _upsert(self, documents: list[LCDocument]) -> None:
+        """Supprime les IDs existants puis ajoute (évite les doublons au re-seed)."""
+        store = self._store()
+        ids = [d.id for d in documents]
+        stale = store.get(ids=ids, include=[]).get("ids", [])
+        if stale:
+            store.delete(ids=stale)
+        store.add_documents(documents, ids=ids)
+
+    # ------------------------------------------------------------------
+    # Ingestion
+    # ------------------------------------------------------------------
+
+    def ingest_batch(self, documents: list[DocumentIngestion]) -> list[str]:
+        self._store()  # vérifie l'initialisation
+        if not documents:
+            return []
+        try:
+            # dict : dédoublonne les IDs identiques au sein du batch (le dernier gagne)
+            by_id = {d.id: d for d in map(self._to_lc_document, documents)}
+            lc_docs = list(by_id.values())
+            self._upsert(lc_docs)
+        except Exception as exc:
+            raise RAGIngestionError(f"Échec de l'ingestion : {exc}") from exc
+        logger.info("Ingestion OK — %d chunk(s)", len(lc_docs))
+        return list(by_id)
+
+    def ingest(self, document: DocumentIngestion) -> str:
+        return self.ingest_batch([document])[0]
+
+    # ------------------------------------------------------------------
+    # Suppression
+    # ------------------------------------------------------------------
+
+    def delete_batch(self, documents: list[DocumentIngestion]) -> list[str]:
+        store = self._store()
+        ids = [self._document_id(d) for d in documents]
+        if not ids:
+            return []
+        try:
+            existing = store.get(ids=ids, include=[]).get("ids", [])
+            if existing:
+                store.delete(ids=existing)
+        except Exception as exc:
+            raise RAGDeletionError(f"Échec de la suppression : {exc}") from exc
+        logger.info("Suppression OK — %d chunk(s)", len(existing))
+        return existing
+
+    def delete_by_filename(self, filename: str) -> list[str]:
+        """Supprime tous les chunks d'un fichier (à appeler avant de le réindexer)."""
+        store = self._store()
+        if not filename:
+            return []
+        try:
+            ids = store.get(where={"filename": {"$eq": filename}}, include=[]).get("ids", [])
+            if ids:
+                store.delete(ids=ids)
+        except Exception as exc:
+            raise RAGDeletionError(f"Échec de la suppression de '{filename}' : {exc}") from exc
+        logger.info("Suppression de '%s' — %d chunk(s)", filename, len(ids))
+        return ids
+
+    # ------------------------------------------------------------------
+    # Recherche vectorielle (le reranking est fait dans retriever.py)
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _build_filter(query: DocumentSearchQuery) -> dict | None:
+        clauses: list[dict] = []
+        if query.category is not None:
+            clauses.append({"category": {"$eq": query.category.value}})
+        if query.department:
+            clauses.append({"department": {"$eq": query.department}})
+        clauses.extend({"tags": {"$contains": tag}} for tag in (query.tags or []))
+
+        if not clauses:
+            return None
+        return clauses[0] if len(clauses) == 1 else {"$and": clauses}
+
+    def vector_search(self, query: DocumentSearchQuery) -> list[DocumentSearchResult]:
+        """Filtres + similarité cosinus + seuil. Renvoie au moins CANDIDATE_POOL
+        candidats, ni triés par le reranker ni coupés à top_k."""
+        store = self._store()
+        try:
+            raw_results = store.similarity_search_with_score(
+                query.query,
+                k=max(query.top_k, CANDIDATE_POOL),
+                filter=self._build_filter(query),
+            )
+        except Exception as exc:
+            raise RAGRetrievalError(f"Échec de la recherche vectorielle : {exc}") from exc
+
+        results: list[DocumentSearchResult] = []
+        for doc, distance in raw_results:
+            similarity = 1.0 - distance  # distance cosinus -> similarité dans [-1, 1]
+            if similarity < query.similarity_threshold:
+                continue
+            results.append(
+                DocumentSearchResult(
+                    document_id=doc.metadata.get("document_id", ""),
+                    content=doc.page_content,
+                    metadata=_from_chroma(doc.metadata),
+                    score=similarity,
+                )
+            )
+        return results
 
 
 def build_rag_service() -> RAGService:
-    """Build and initialize a RAGService from application settings."""
-    from langchain_community.embeddings import OllamaEmbeddings
+    """Construit et initialise un RAGService à partir des settings."""
+    from langchain_ollama import OllamaEmbeddings  # pip install langchain-ollama
 
     from core.config import get_settings
 
     settings = get_settings()
-
     rag = RAGService(
         embedding_function=OllamaEmbeddings(
             model=settings.ollama_embedding_model,

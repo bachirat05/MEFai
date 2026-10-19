@@ -11,12 +11,12 @@ from core.config import get_settings
 from Backend.services.mcp.mcp_client import (
     normalize_search_documents_arguments,
 )
-from chat.prompt import SYSTEM_PROMPT
-from chat.model_factory import build_model
-from chat.question_analyzer import (is_document_question, extract_search_subject, infer_document_category)
-from chat.conversation_context import build_contextual_search_query
-from chat.document_context import preload_document_context
-from chat.answer_utils import (
+from services.chat.prompt import SYSTEM_PROMPT
+from services.chat.model_factory import build_model
+from services.chat.question_analyzer import (is_document_question, extract_search_subject, infer_document_category)
+from services.chat.conversation_context import build_contextual_search_query
+from services.chat.document_context import preload_document_context
+from services.chat.answer_utils import (
     DOCUMENT_FALLBACK_ANSWER,
     build_answer_from_preloaded_context,
     is_document_fallback_answer,

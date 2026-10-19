@@ -587,7 +587,9 @@ function AuditLogsPage({
               description={
                 hasActiveFilters(filters)
                   ? "Aucun evenement ne correspond aux filtres selectionnes."
-                  : "Les evenements apparaitront ici apres les actions dans Cortex AI."
+
+                  : "Les evenements apparaitront ici apres les actions dans MEFai."
+
               }
             />
           ) : (

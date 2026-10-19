@@ -17,7 +17,9 @@ from services.chat.chat_service import (
     build_answer_from_preloaded_context,
     remove_empty_bullet_lines,
 )
+
 from Backend.services.mcp.mcp_client import normalize_search_documents_arguments
+
 
 
 class FakeRAGService:

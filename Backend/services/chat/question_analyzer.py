@@ -46,7 +46,7 @@ DOCUMENT_VALUE_MARKERS = (
 )
 
 # détermine si la question concerne les documents RH
-def is_document_question(self, message: str,) -> bool:
+def is_document_question(message: str,) -> bool:
     normalized = message.lower()
     markers = (
         "politique",
@@ -90,7 +90,6 @@ def is_document_question(self, message: str,) -> bool:
 
 # identifie une catégorie telle que benefits, leave_policy ou training
 def extract_search_subject(
-        self,
         message: str,
     ) -> str:
         normalized = message.lower()
@@ -161,7 +160,6 @@ def extract_search_subject(
 
 # extrait le sujet d'une question pour aider les recherches ultérieures
 def infer_document_category(
-        self,
         message: str,
     ) -> str | None:
         normalized = message.lower()
