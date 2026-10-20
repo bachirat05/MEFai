@@ -43,3 +43,5 @@ Thumbs.db
 firebase_admin_key.json
 
 *.db
+
+Frontend/src/firebase.ts
