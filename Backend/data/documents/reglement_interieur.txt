@@ -10,4 +10,4 @@ Tout employé doit respecter les règles d'accès aux locaux, aux applications e
 
 Les procédures RH et administratives doivent être suivies via les canaux officiels prévus par l'organisation.
 
-Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.
+Ce document est fictif et destiné uniquement aux tests du système RAG MEFai.

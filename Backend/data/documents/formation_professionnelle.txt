@@ -15,4 +15,4 @@ Les formations prioritaires sont celles directement liées aux besoins du poste,
 
 À la fin de la formation, l'employé peut être invité à fournir une attestation de participation et un retour d'expérience.
 
-Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.
+Ce document est fictif et destiné uniquement aux tests du système RAG MEFai.

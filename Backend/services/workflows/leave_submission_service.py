@@ -13,6 +13,7 @@ from Backend.sqlite.leave_models import LeaveRequestModel
 from schemas.workflow import (
     DemandeConge,
     DemandeCongeResponse,
+    TypeConge,
 )
 from services.audit.activity_log_service import (
     LEAVE_CREATED,
@@ -34,6 +35,50 @@ class LeaveSubmissionError(Exception):
 class NoManagerAvailableError(LeaveSubmissionError):
     pass
 
+class LeaveBusinessRuleError(LeaveSubmissionError):
+    pass
+
+
+def validate_leave_request(
+    *,
+    demande: DemandeConge,
+    user_uid: str,
+    db: Session,
+) -> None:
+
+    existing_requests = (
+        db.query(LeaveRequestModel)
+        .filter(
+            LeaveRequestModel.user_uid == user_uid,
+            LeaveRequestModel.statut.in_(
+                ["pending", "accepted"]
+            ),
+        )
+        .all()
+    )
+
+    for existing in existing_requests:
+
+        # Règle 1 : périodes de congé qui se chevauchent
+        if (
+            demande.date_debut <= existing.date_fin
+            and demande.date_fin >= existing.date_debut
+        ):
+            raise LeaveBusinessRuleError(
+                "Vous avez déjà une demande de congé "
+                "en attente ou acceptée sur cette période."
+            )
+
+        # Règle 2 : congé annuel une fois par année
+        if (
+            demande.type_conge == TypeConge.CONGE_ANNUEL
+            and existing.type_conge == TypeConge.CONGE_ANNUEL.value
+            and existing.date_debut.year == demande.date_debut.year
+        ):
+            raise LeaveBusinessRuleError(
+                "Vous avez déjà demandé un congé annuel "
+                "pour cette année."
+            )
 
 async def submit_leave_request(
     *,
@@ -42,6 +87,19 @@ async def submit_leave_request(
     db: Session,
     n8n_service: N8nService,
 ) -> DemandeCongeResponse:
+
+    user_uid = user.get("uid")
+    if not user_uid:
+        raise LeaveSubmissionError(
+            "Identifiant utilisateur Firebase manquant."
+        )
+
+    # Vérifier les règles métier avant n8n
+    validate_leave_request(
+        demande=demande,
+        user_uid=user_uid,
+        db=db,
+    )
     try:
         manager_email = resolve_manager_email()
     except ManagerResolutionError as exc:

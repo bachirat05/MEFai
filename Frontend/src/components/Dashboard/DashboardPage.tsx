@@ -637,20 +637,13 @@ function DashboardPage({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-3">
           <KpiCard
             title="Documents"
             value={isAdmin ? (isLoading ? "..." : documents.length) : "Non disponible"}
             caption={isAdmin ? "Base documentaire RAG" : "Reserve aux administrateurs"}
             icon={FileText}
             tone="violet"
-          />
-          <KpiCard
-            title="Demandes Conges"
-            value={isLoading ? "..." : leaveRequests.length}
-            caption={`${pendingLeaves} en attente`}
-            icon={CalendarDays}
-            tone="emerald"
           />
           <KpiCard
             title="Conversations"

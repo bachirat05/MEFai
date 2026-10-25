@@ -14,4 +14,4 @@ Toute suspicion de fuite de données, d'accès non autorisé ou d'incident de s�
 
 Les utilisateurs doivent verrouiller leur session lorsqu'ils quittent leur poste de travail.
 
-Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.
+Ce document est fictif et destiné uniquement aux tests du système RAG MEFai.

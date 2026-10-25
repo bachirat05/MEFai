@@ -11,4 +11,4 @@ L'accès à un avantage peut dépendre de critères tels que l'ancienneté, la s
 
 Toute demande relative à un avantage social doit être adressée au service RH via le canal prévu à cet effet.
 
-Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.
+Ce document est fictif et destiné uniquement aux tests du système RAG MEFai.

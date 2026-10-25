@@ -77,17 +77,22 @@ function Sidebar({
       page: "chat",
       icon: MessageSquare,
     },
-    {
-      label: "Demande de conge",
-      page: "leave",
-      icon: CalendarDays,
-    },
-    {
-      label: "Mes demandes",
-      page: "requests",
-      icon: ClipboardList,
-    },
-  ];
+     ...(!isAdmin && !isManager
+    ? [
+        {
+          label: "Demande de congé",
+          page: "leave" as const,
+          icon: CalendarDays,
+        },
+        {
+          label: "Mes demandes",
+          page: "requests" as const,
+          icon: ClipboardList,
+        },
+      ]
+    : []),
+];
+      
 
   const managementItems: NavigationItem[] = [
     ...(isManager
@@ -179,9 +184,11 @@ function Sidebar({
     <aside className={`hidden shrink-0 flex-col border-r border-slate-200 bg-white/95 transition-all duration-200 md:flex ${isCollapsed ? "w-24" : "w-72"}`}>
       <div className={`flex h-[74px] items-center ${isCollapsed ? "justify-center px-3" : "px-5"}`}>
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-600 text-white shadow-sm shadow-violet-200">
-            <BrainCircuit size={24} />
-          </div>
+          <img
+            src="/MEFai.png"
+            alt="Logo MEFai"
+            className="h-11 w-11 shrink-0 object-contain"
+          />
 
           {!isCollapsed ? (
           <div>

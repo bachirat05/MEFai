@@ -1,6 +1,6 @@
 POLITIQUE INTERNE DE MOBILITÉ — DOCUMENT DE TEST
 
-Ce document est utilisé uniquement pour tester le système RAG Cortex AI.
+Ce document est utilisé uniquement pour tester le système RAG MEFai.
 
 1. Délai de traitement
 Une demande de mobilité interne est traitée dans un délai maximum de 17 jours ouvrés.

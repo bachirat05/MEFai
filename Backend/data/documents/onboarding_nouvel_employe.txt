@@ -15,4 +15,4 @@ Les accès informatiques doivent être accordés uniquement selon les besoins li
 
 Le manager organise un point de suivi durant la période d'intégration afin de vérifier que l'employé dispose des informations et moyens nécessaires.
 
-Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.
+Ce document est fictif et destiné uniquement aux tests du système RAG MEFai.

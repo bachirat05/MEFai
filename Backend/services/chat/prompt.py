@@ -122,7 +122,7 @@ de test ou non officiel, ne le présente jamais comme un document officiel.
 Ajoute uniquement dans ce cas, à la fin de la réponse :
 
 "Note : Ce document est utilisé uniquement à des fins de démonstration
-et de test du système RAG Cortex AI. Il ne constitue pas une procédure
+et de test du système RAG MEFai. Il ne constitue pas une procédure
 officielle du Ministère."
 
 N'ajoute jamais cette note si le document récupéré ne contient pas

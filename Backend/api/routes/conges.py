@@ -34,6 +34,7 @@ from services.workflows.n8n_service import (
 from services.workflows.leave_submission_service import (
     NoManagerAvailableError,
     submit_leave_request,
+    LeaveBusinessRuleError,
 )
 from services.audit.activity_log_service import (
     LEAVE_ACCEPTED,
@@ -81,6 +82,12 @@ async def soumettre_conge(
             db=db,
             n8n_service=n8n_service,
         )
+    
+    except LeaveBusinessRuleError as exc:
+        raise HTTPException(
+            status_code=409,
+            detail=str(exc),
+        ) from exc
 
     except NoManagerAvailableError as exc:
         raise HTTPException(

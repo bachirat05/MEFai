@@ -19,4 +19,4 @@ Une demande acceptée prend le statut « accepted ».
 Une demande refusée prend le statut « rejected ».
 Une demande en cours de traitement conserve le statut « pending ».
 
-Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.
+Ce document est fictif et destiné uniquement aux tests du système RAG MEFai.

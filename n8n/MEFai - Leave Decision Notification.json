@@ -1,0 +1,213 @@
+{
+  "name": "MEFai - Leave Decision Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notification-statut-conge",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -288,
+        64
+      ],
+      "id": "98eecaed-f975-4955-9a46-743f5cffe710",
+      "name": "Webhook",
+      "webhookId": "2c124893-eb57-45c1-87ba-dac7fe918525",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4rH2u1pCm8bT6rDP",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b05859d1-7300-4bf5-9d1e-c577a6b89936",
+              "leftValue": "={{$json.body.statut}}",
+              "rightValue": "accepted",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -64,
+        64
+      ],
+      "id": "0378f3ae-d86f-4698-9ac3-ae632c626612",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-smtp-sender@example.com",
+        "toEmail": "={{$json.body.email}}",
+        "subject": "=[MEFai] Mise à jour de votre demande — {{$json.body.demande_id}}",
+        "html": "=<div style=\"font-family:Arial,Helvetica,sans-serif;background:#f6f7fb;padding:32px 16px;color:#1f2937;\">\n\n  <div style=\"max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;\">\n\n    <!-- Header -->\n    <div style=\"background:#6d4aff;padding:24px 28px;\">\n      <div style=\"font-size:13px;color:#ddd6fe;letter-spacing:.5px;\">\n        MEFai\n      </div>\n\n      <div style=\"margin-top:6px;font-size:22px;font-weight:700;color:#ffffff;\">\n        Mise à jour de votre demande de congé\n      </div>\n    </div>\n\n    <!-- Content -->\n    <div style=\"padding:28px;\">\n\n      <p style=\"margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#4b5563;\">\n        Votre demande de congé a été traitée par votre manager.\n      </p>\n\n      <!-- Status card -->\n      <div style=\"\n        padding:18px;\n        border-radius:12px;\n        margin-bottom:24px;\n        background:{{$json.body.statut === 'accepted' ? '#ecfdf5' : '#fef2f2'}};\n        border:1px solid {{$json.body.statut === 'accepted' ? '#a7f3d0' : '#fecaca'}};\n      \">\n\n        <div style=\"font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:6px;\">\n          Statut\n        </div>\n\n        <div style=\"\n          font-size:20px;\n          font-weight:700;\n          color:{{$json.body.statut === 'accepted' ? '#047857' : '#b91c1c'}};\n        \">\n          {{$json.body.statut === 'accepted' ? 'Demande acceptée' : 'Demande refusée'}}\n        </div>\n\n      </div>\n\n      <!-- Details -->\n      <div style=\"border:1px solid #e5e7eb;border-radius:12px;padding:18px;margin-bottom:24px;\">\n\n        <div style=\"margin-bottom:14px;\">\n          <div style=\"font-size:12px;color:#9ca3af;margin-bottom:4px;\">\n            Référence de la demande\n          </div>\n\n          <div style=\"font-size:15px;font-weight:700;color:#111827;\">\n            {{$json.body.demande_id}}\n          </div>\n        </div>\n\n        <div>\n          <div style=\"font-size:12px;color:#9ca3af;margin-bottom:4px;\">\n            Décision\n          </div>\n\n          <div style=\"font-size:15px;font-weight:600;color:#374151;\">\n            {{$json.body.statut === 'accepted' ? 'Acceptée par le manager' : 'Refusée par le manager'}}\n          </div>\n        </div>\n\n      </div>\n\n      <p style=\"font-size:14px;line-height:1.6;color:#6b7280;margin:0;\">\n        Vous pouvez consulter le détail et le statut actualisé depuis la rubrique\n        <strong style=\"color:#374151;\">Mes demandes</strong> dans MEFai.\n      </p>\n\n    </div>\n\n    <!-- Footer -->\n    <div style=\"background:#f9fafb;border-top:1px solid #e5e7eb;padding:18px 28px;text-align:center;\">\n      <div style=\"font-size:12px;color:#9ca3af;\">\n        Notification automatique — MEFai\n      </div>\n    </div>\n\n  </div>\n\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        160,
+        -32
+      ],
+      "id": "9122e765-d5df-4c76-ab7c-e62c82612aef",
+      "name": "Send an Email",
+      "webhookId": "c4f37fd0-5315-4c82-903b-25bf8e27362b",
+      "credentials": {
+        "smtp": {
+          "id": "Mh5ga2I5om8jlgOW",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-smtp-sender@example.com",
+        "toEmail": "={{$json.body.email}}",
+        "subject": "=[MEFai] Mise à jour de votre demande — {{$json.body.demande_id}}",
+        "html": "=<div style=\"font-family:Arial,Helvetica,sans-serif;background:#f6f7fb;padding:32px 16px;color:#1f2937;\">\n\n  <div style=\"max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;\">\n\n    <!-- Header -->\n    <div style=\"background:#6d4aff;padding:24px 28px;\">\n      <div style=\"font-size:13px;color:#ddd6fe;letter-spacing:.5px;\">\n        MEFai\n      </div>\n\n      <div style=\"margin-top:6px;font-size:22px;font-weight:700;color:#ffffff;\">\n        Mise à jour de votre demande de congé\n      </div>\n    </div>\n\n    <!-- Content -->\n    <div style=\"padding:28px;\">\n\n      <p style=\"margin:0 0 20px 0;font-size:15px;line-height:1.6;color:#4b5563;\">\n        Votre demande de congé a été traitée par votre manager.\n      </p>\n\n      <!-- Status card -->\n      <div style=\"\n        padding:18px;\n        border-radius:12px;\n        margin-bottom:24px;\n        background:{{$json.body.statut === 'accepted' ? '#ecfdf5' : '#fef2f2'}};\n        border:1px solid {{$json.body.statut === 'accepted' ? '#a7f3d0' : '#fecaca'}};\n      \">\n\n        <div style=\"font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:6px;\">\n          Statut\n        </div>\n\n        <div style=\"\n          font-size:20px;\n          font-weight:700;\n          color:{{$json.body.statut === 'accepted' ? '#047857' : '#b91c1c'}};\n        \">\n          {{$json.body.statut === 'accepted' ? 'Demande acceptée' : 'Demande refusée'}}\n        </div>\n\n      </div>\n\n      <!-- Details -->\n      <div style=\"border:1px solid #e5e7eb;border-radius:12px;padding:18px;margin-bottom:24px;\">\n\n        <div style=\"margin-bottom:14px;\">\n          <div style=\"font-size:12px;color:#9ca3af;margin-bottom:4px;\">\n            Référence de la demande\n          </div>\n\n          <div style=\"font-size:15px;font-weight:700;color:#111827;\">\n            {{$json.body.demande_id}}\n          </div>\n        </div>\n\n        <div>\n          <div style=\"font-size:12px;color:#9ca3af;margin-bottom:4px;\">\n            Décision\n          </div>\n\n          <div style=\"font-size:15px;font-weight:600;color:#374151;\">\n            {{$json.body.statut === 'accepted' ? 'Acceptée par le manager' : 'Refusée par le manager'}}\n          </div>\n        </div>\n\n      </div>\n\n      <p style=\"font-size:14px;line-height:1.6;color:#6b7280;margin:0;\">\n        Vous pouvez consulter le détail et le statut actualisé depuis la rubrique\n        <strong style=\"color:#374151;\">Mes demandes</strong> dans MEFai.\n      </p>\n\n    </div>\n\n    <!-- Footer -->\n    <div style=\"background:#f9fafb;border-top:1px solid #e5e7eb;padding:18px 28px;text-align:center;\">\n      <div style=\"font-size:12px;color:#9ca3af;\">\n        Notification automatique — MEFai\n      </div>\n    </div>\n\n  </div>\n\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        160,
+        160
+      ],
+      "id": "c2d93b2c-9491-4f6b-90b0-66c17c0c7e60",
+      "name": "Send an Email1",
+      "webhookId": "09d28595-6b08-4173-a42a-dcb0c31d1cad",
+      "credentials": {
+        "smtp": {
+          "id": "Mh5ga2I5om8jlgOW",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"statut\": \"accepted\",\n  \"message\": \"Notification envoyée à l'employé.\",\n  \"demande_id\": \"{{$json.body.demande_id}}\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        384,
+        -32
+      ],
+      "id": "99cf5699-a7ba-4f6e-a0e2-480eb49fe345",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"statut\": \"rejected\",\n  \"message\": \"Notification de refus envoyée à l'employé.\",\n  \"demande_id\": \"{{$json.body.demande_id}}\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        384,
+        160
+      ],
+      "id": "13a2e144-fc76-4562-80ed-47272b0dadf2",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send an Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "89440e20-7c30-4e9c-9517-24737853383d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d5836d103f3b2a787838a5ad5f3c82f36331432b7b4f2e1dc3c80c1f0d559b8c"
+  },
+  "nodeGroups": [],
+  "id": "YjHIK1w5ICamszDf",
+  "tags": []
+}

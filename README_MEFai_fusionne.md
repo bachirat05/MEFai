@@ -1,8 +1,266 @@
-# Cortex AI — Résumé du projet
+# MEFai — Assistant RH Intelligent
+
+MEFai est une plateforme RH intelligente développée comme preuve de concept (PoC) professionnelle pour le contexte du Ministère de l'Économie et des Finances du Maroc. Elle combine assistant conversationnel, IA locale, RAG, workflows métier, authentification, contrôle d'accès et administration.
+
+## Stack technique
+
+| Domaine | Technologies |
+|---|---|
+| Frontend | React, TypeScript, Vite, Tailwind CSS |
+| Backend | Python, FastAPI, Pydantic, httpx |
+| Identité et autorisations | Firebase Authentication, Firebase Admin SDK, Firebase Custom Claims (RBAC) |
+| Agent IA | LangGraph ReAct, LangChain, MCP |
+| Modèle et embeddings | Ollama, Qwen3:8b, nomic-embed-text |
+| Recherche documentaire | ChromaDB, RAG, ingestion TXT/PDF/DOCX |
+| Données métier | SQLite |
+| Automatisation | n8n |
+| Qualité | pytest, build et lint frontend |
+
+## Fonctionnalités
+
+- Chat RH intelligent fondé sur les documents internes, avec sources et catégories.
+- Ingestion documentaire `.txt`, `.pdf` et `.docx`, recherche sémantique et réponses RAG.
+- Authentification Firebase et RBAC : `employee`, `manager`, `admin`.
+- Demandes de congé, historique et suivi des statuts.
+- Validation ou refus par un manager, persistance SQLite et notifications email via n8n.
+- Administration, consultation des documents et suivi du statut des services.
+- Journaux d'activité et d'audit : se reporter à l'état d'implémentation dans le résumé technique ci-dessous.
+- Tests backend automatisés.
+
+## Installation et démarrage
+
+### 1. Cloner le dépôt
+
+```bash
+git clone <URL_DU_REPOSITORY>
+cd Cortex_AI_Minist-re
+git fetch origin
+git switch zouhair
+git pull
+```
+
+La branche de développement indiquée dans la documentation fournie est `zouhair`.
+
+### 2. Environnement Python
+
+Sous Windows PowerShell, depuis la racine du dépôt :
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+### 3. Configuration FastAPI
+
+Créer le fichier d'environnement à partir de l'exemple :
+
+```powershell
+Copy-Item .env.example Backend\.env
+```
+
+Exemple de paramètres à adapter à votre environnement :
+
+```dotenv
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=poolside/laguna-s-2.1:free
+LLM_BASE_URL=https://openrouter.ai/api/v1
+
+OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+OLLAMA_BASE_URL=http://localhost:11434
+
+CHROMA_PERSIST_DIR=./chroma_db
+CHROMA_COLLECTION_NAME=rh_documents
+
+N8N_WEBHOOK_URL=http://localhost:5678/webhook/conge-test
+N8N_SECRET_TOKEN=
+N8N_TIMEOUT_SECONDS=15
+N8N_STATUS_NOTIFICATION_WEBHOOK_URL=http://localhost:5678/webhook/notification-statut-conge
+
+SERVER_PORT=8000
+```
+
+**Attention :** la documentation décrit principalement Qwen3:8b exécuté localement par Ollama. Les variables OpenRouter sont conservées comme configuration mentionnée dans le premier document ; leur utilisation effective dépend du code et de la configuration de la branche utilisée.
+
+### 4. Firebase Admin
+
+Le backend attend un compte de service Firebase au chemin :
+
+```text
+Backend/firebase_admin_key.json
+```
+
+Récupérer ce fichier par un canal sécurisé auprès d'une personne autorisée. Ne jamais le publier dans le dépôt.
+
+### 5. Installer et préparer Ollama
+
+```bash
+ollama pull qwen3:8b
+ollama pull nomic-embed-text
+ollama list
+```
+
+Si le service n'est pas déjà actif :
+
+```powershell
+ollama serve
+```
+
+URL locale habituelle : `http://localhost:11434`.
+
+### 6. Lancer le backend
+
+Depuis la racine du projet, avec l'environnement virtuel activé :
+
+```powershell
+python -m uvicorn app.main:app --app-dir Backend --host 127.0.0.1 --port 8000
+```
+
+- API : http://127.0.0.1:8000
+- Documentation Swagger : http://127.0.0.1:8000/docs
+
+### 7. Lancer le frontend
+
+Dans un deuxième terminal :
+
+```powershell
+cd Frontend
+npm install
+npm run dev
+```
+
+URL Vite habituelle : http://localhost:5173.
+
+**Note :** les documents historiques mentionnent aussi `frontend/` en minuscules. Vérifier la casse exacte du dossier dans la branche clonée.
+
+### 8. Configurer n8n
+
+Démarrer n8n séparément et publier les workflows nécessaires. Renseigner les URLs de webhook et les secrets dans `Backend/.env`.
+
+- Soumission : `/webhook/conge-test`
+- Notification du statut : `/webhook/notification-statut-conge`
+
+Les URLs `/webhook-test/...` servent aux essais interactifs ; les workflows publiés utilisent `/webhook/...`.
+
+## RAG et documents
+
+- Répertoire d'ingestion : `Backend/data/documents/`.
+- Formats pris en charge : TXT, PDF et DOCX.
+- Collection ChromaDB : `rh_documents`.
+- Modèle d'embeddings : `nomic-embed-text` via Ollama.
+
+La documentation technique décrit le découpage en chunks, les métadonnées, la recherche et les corrections apportées au grounding. Les documents de démonstration ne sont **pas** des politiques officielles du Ministère.
+
+## Tests et validation
+
+Depuis la racine du projet :
+
+```powershell
+pytest Backend/tests
+```
+
+Le premier document indique un état de référence de **84 tests réussis** ; le résumé historique contient également des résultats antérieurs, notamment **10 passed, 1 warning**. Ces résultats correspondent à des états documentés différents et n'ont pas été réexécutés lors de cette fusion.
+
+Pour le frontend :
+
+```powershell
+cd Frontend
+npm run build
+npm run lint
+```
+
+## Accès selon les rôles
+
+| Rôle | Espaces principaux |
+|---|---|
+| Employee | Chat IA, demande de congé, mes demandes, paramètres |
+| Manager | Espaces Employee + espace Manager |
+| Admin | Espaces Manager + administration, documents, audit logs (selon l'état de déploiement) |
+
+Les contrôles d'accès doivent être appliqués côté backend, pas seulement dans la navigation React.
+
+## Architecture fonctionnelle
+
+```text
+Utilisateur
+  ↓
+React / TypeScript
+  ↓
+Firebase Authentication (ID Token)
+  ↓
+FastAPI (validation token / RBAC)
+  ├── Chat → LangGraph ReAct → MCP → RAG / ChromaDB → Ollama / Qwen3:8b
+  ├── Congés → SQLite → n8n → Manager → décision → notification
+  └── Administration / Documents / Statuts / Journaux
+```
+
+### Workflow de congé
+
+```text
+Employé → React → FastAPI → n8n (soumission + email manager)
+                         ↓
+                   SQLite : pending
+                         ↓
+               Manager : accepted / rejected
+                         ↓
+                  SQLite + n8n (notification)
+                         ↓
+                        Employé
+```
+
+## Sécurité
+
+Ne jamais committer ni exposer :
+
+```gitignore
+.env
+Backend/.env
+firebase_admin_key.json
+*.db
+chroma_db/
+.venv/
+node_modules/
+```
+
+Ne jamais divulguer mots de passe, tokens Firebase, clés de comptes de service, secrets n8n, en-têtes `Authorization` ni données RH sensibles. Les webhooks, permissions documentaires et mécanismes d'audit doivent être durcis et vérifiés avant toute mise en production.
+
+## Structure indicative
+
+```text
+Cortex_AI_Minist-re/
+├── Backend/
+│   ├── app/
+│   ├── api/                  (selon la branche)
+│   ├── core/                 (selon la branche)
+│   ├── data/documents/
+│   ├── services/             (selon la branche)
+│   └── tests/
+├── Frontend/
+│   ├── src/
+│   └── public/
+├── .env.example
+├── .gitignore
+├── requirements.txt
+└── README.md
+```
+
+La structure exacte dépend de la branche et des refactorisations successives décrites ci-dessous.
+
+## État et évolutions prévues
+
+Le projet est documenté comme un PoC avancé. Les pistes mentionnées incluent le durcissement des webhooks, Docker / Docker Compose, CI/CD, monitoring, gestion avancée des rôles et utilisateurs et permissions fines sur les documents RAG. Certaines fonctionnalités ont évolué au fil du résumé historique ; consulter les sections les plus récentes pour leur état.
+
+---
+
+# Documentation technique détaillée et historique du projet
+
+Cette seconde partie conserve **intégralement** le résumé technique fourni, avec ses architectures, validations, changements et états successifs. Les sections anciennes peuvent décrire des fonctionnalités encore prévues qui ont ensuite été implémentées ; les mises à jour les plus récentes prévalent pour le suivi historique. Le contenu n'a pas été vérifié contre le dépôt Git.
+
+# MEFai — Résumé du projet
 
 ## 1. Présentation
 
-**Cortex AI** est un assistant conversationnel intelligent orienté RH, destiné au contexte du **Ministère de l'Économie et des Finances du Maroc**.
+**MEFai** est un assistant conversationnel intelligent orienté RH, destiné au contexte du **Ministère de l'Économie et des Finances du Maroc**.
 
 Le projet combine une interface web React, l'authentification Firebase, une API FastAPI sécurisée, un agent LangGraph ReAct, un LLM local **Qwen3:8b** exécuté avec Ollama, un pipeline **RAG** basé sur ChromaDB et des outils métier exposés via **MCP**.
 
@@ -2671,7 +2929,7 @@ Les warnings restants sont principalement des warnings de dépréciation, notamm
 
 ### 37.1 Refonte UI
 
-La page **Demande de congé** a été redesignée afin de rester cohérente avec le nouveau Dashboard Cortex AI.
+La page **Demande de congé** a été redesignée afin de rester cohérente avec le nouveau Dashboard MEFai.
 
 La page comporte maintenant :
 
@@ -3043,7 +3301,7 @@ Après cette étape :
 
 ## 41. Résumé exécutif final actualisé
 
-Cortex AI est maintenant un PoC RH souverain fonctionnel combinant :
+MEFai est maintenant un PoC RH souverain fonctionnel combinant :
 
 ```text
 React / TypeScript / Tailwind
@@ -3485,7 +3743,7 @@ Durcissement sécurité des webhooks n8n
 
 ## 50. Résumé exécutif actualisé
 
-Cortex AI est maintenant une plateforme RH IA multi-flux avec :
+MEFai est maintenant une plateforme RH IA multi-flux avec :
 
 ```text
 React / TypeScript
@@ -3845,7 +4103,7 @@ Administration
 [x] Espace Manager réservé au manager
 [x] accept / reject réservé au manager
 [x] notification employé accept / reject validée réellement
-[x] template email décision Cortex AI final validé
+[x] template email décision MEFai final validé
 [x] Audit Log LEAVE_CREATED / ACCEPTED / REJECTED
 
 [x] Documents admin-only
@@ -3888,7 +4146,7 @@ Puis :
 
 ## 55. Résumé exécutif actualisé
 
-Cortex AI dispose désormais de plusieurs caractéristiques de niveau application professionnelle :
+MEFai dispose désormais de plusieurs caractéristiques de niveau application professionnelle :
 
 ```text
 Authentification multi-rôles
@@ -4389,7 +4647,7 @@ aux credentials SMTP
 Le template a été reconstruit sur une base simple et validée, avec :
 
 ```text
-header Cortex AI violet
+header MEFai violet
 statut dynamique
 vert pour accepted
 rouge pour rejected
@@ -4401,7 +4659,7 @@ footer notification automatique
 Le subject final reste de type :
 
 ```text
-[Cortex AI] Mise à jour de votre demande — <demande_id>
+[MEFai] Mise à jour de votre demande — <demande_id>
 ```
 
 Les tests réels `accepted` et `rejected` ont confirmé la réception des emails.
@@ -4583,7 +4841,7 @@ Les priorités techniques de fond restent :
 
 ## 63. Résumé exécutif final — version 8
 
-Cortex AI est maintenant validé sur un périmètre fonctionnel plus large qu'en version 7.
+MEFai est maintenant validé sur un périmètre fonctionnel plus large qu'en version 7.
 
 Le système combine :
 

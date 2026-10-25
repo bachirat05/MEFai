@@ -1,21 +1,29 @@
 {
-  "name": "Cortex AI - Leave Submission",
+  "name": "MEFai- Leave Submission",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "conge-test",
+        "authentication": "headerAuth",
         "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        0,
-        0
+        224,
+        -64
       ],
-      "id": "c1d0632c-09e6-4ac8-a633-fb4846f633c5",
-      "name": "Webhook"
+      "id": "989c7757-0c05-4ba6-b37b-5189293f58a7",
+      "name": "Webhook",
+      "webhookId": "4b45aac5-1209-4ae7-812d-fe2c6e8bad61",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4rH2u1pCm8bT6rDP",
+          "name": "Header Auth account"
+        }
+      }
     },
     {
       "parameters": {
@@ -24,28 +32,35 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        224,
-        0
+        448,
+        -64
       ],
-      "id": "1fb75fbb-35cd-44eb-b1d4-f5e449b19d9e",
+      "id": "626dd70f-d786-4135-83e6-7472b406e99c",
       "name": "Valider demande de congé"
     },
     {
       "parameters": {
         "fromEmail": "your-smtp-sender@example.com",
         "toEmail": "={{$json.manager_email}}",
-        "subject": "=[Cortex AI] Nouvelle demande de congé — {{$json.demande_id}}",
-        "html": "=<div style=\"font-family: Arial, sans-serif; background:#f8fafc; padding:32px;\">\n  <div style=\"max-width:640px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius:16px; overflow:hidden;\">\n\n    <div style=\"padding:24px 28px; border-bottom:1px solid #e5e7eb;\">\n      <div style=\"font-size:13px; color:#7c3aed; font-weight:700; letter-spacing:.04em;\">\n        CORTEX AI · RH\n      </div>\n\n      <h2 style=\"margin:8px 0 6px; color:#111827; font-size:24px;\">\n        Nouvelle demande de congé\n      </h2>\n\n      <p style=\"margin:0; color:#6b7280; font-size:14px;\">\n        Une nouvelle demande nécessite votre validation.\n      </p>\n    </div>\n\n    <div style=\"padding:28px;\">\n\n      <div style=\"background:#f5f3ff; border:1px solid #ede9fe; border-radius:12px; padding:16px 18px; margin-bottom:24px;\">\n        <div style=\"font-size:12px; color:#6d28d9; font-weight:700;\">\n          RÉFÉRENCE\n        </div>\n        <div style=\"font-size:18px; color:#111827; font-weight:700; margin-top:4px;\">\n          {{$json.demande_id}}\n        </div>\n      </div>\n\n      <table style=\"width:100%; border-collapse:collapse; font-size:14px;\">\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Employé</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.employe_id}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Type de congé</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.type_conge}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Date de début</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.date_debut}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Date de fin</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.date_fin}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Motif</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.motif}}\n          </td>\n        </tr>\n      </table>\n\n      <div style=\"margin-top:24px; padding:14px 16px; background:#fff7ed; border:1px solid #fed7aa; border-radius:10px;\">\n        <span style=\"color:#9a3412; font-size:13px; font-weight:700;\">\n          Statut : En attente de validation\n        </span>\n      </div>\n\n      <p style=\"margin:24px 0 0; color:#6b7280; font-size:13px; line-height:1.6;\">\n        Connectez-vous à l’Espace Manager Cortex AI pour consulter la demande et prendre une décision.\n      </p>\n\n    </div>\n\n    <div style=\"padding:18px 28px; background:#f9fafb; border-top:1px solid #e5e7eb; color:#9ca3af; font-size:12px;\">\n      Notification automatique générée par Cortex AI · Assistant RH intelligent\n    </div>\n\n  </div>\n</div>",
+        "subject": "=[MEFai] Nouvelle demande de congé — {{$json.demande_id}}",
+        "html": "=<div style=\"font-family: Arial, sans-serif; background:#f8fafc; padding:32px;\">\n  <div style=\"max-width:640px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; border-radius:16px; overflow:hidden;\">\n\n    <div style=\"padding:24px 28px; border-bottom:1px solid #e5e7eb;\">\n      <div style=\"font-size:13px; color:#7c3aed; font-weight:700; letter-spacing:.04em;\">\n        MEFai · RH\n      </div>\n\n      <h2 style=\"margin:8px 0 6px; color:#111827; font-size:24px;\">\n        Nouvelle demande de congé\n      </h2>\n\n      <p style=\"margin:0; color:#6b7280; font-size:14px;\">\n        Une nouvelle demande nécessite votre validation.\n      </p>\n    </div>\n\n    <div style=\"padding:28px;\">\n\n      <div style=\"background:#f5f3ff; border:1px solid #ede9fe; border-radius:12px; padding:16px 18px; margin-bottom:24px;\">\n        <div style=\"font-size:12px; color:#6d28d9; font-weight:700;\">\n          RÉFÉRENCE\n        </div>\n        <div style=\"font-size:18px; color:#111827; font-weight:700; margin-top:4px;\">\n          {{$json.demande_id}}\n        </div>\n      </div>\n\n      <table style=\"width:100%; border-collapse:collapse; font-size:14px;\">\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Employé</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.employe_id}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Type de congé</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.type_conge}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Date de début</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.date_debut}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Date de fin</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.date_fin}}\n          </td>\n        </tr>\n\n        <tr>\n          <td style=\"padding:10px 0; color:#6b7280;\">Motif</td>\n          <td style=\"padding:10px 0; color:#111827; font-weight:600; text-align:right;\">\n            {{$json.motif}}\n          </td>\n        </tr>\n      </table>\n\n      <div style=\"margin-top:24px; padding:14px 16px; background:#fff7ed; border:1px solid #fed7aa; border-radius:10px;\">\n        <span style=\"color:#9a3412; font-size:13px; font-weight:700;\">\n          Statut : En attente de validation\n        </span>\n      </div>\n\n      <p style=\"margin:24px 0 0; color:#6b7280; font-size:13px; line-height:1.6;\">\n        Connectez-vous à l’Espace Manager MEFai pour consulter la demande et prendre une décision.\n      </p>\n\n    </div>\n\n    <div style=\"padding:18px 28px; background:#f9fafb; border-top:1px solid #e5e7eb; color:#9ca3af; font-size:12px;\">\n      Notification automatique générée par MEFai · Assistant RH intelligent\n    </div>\n\n  </div>\n</div>",
         "options": {}
       },
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        672,
-        0
+        896,
+        -64
       ],
-      "id": "34596109-8559-4ab5-895b-6528288ac505",
-      "name": "Send an Email"
+      "id": "6f2207eb-69b8-44da-b5c4-b491cfe3931b",
+      "name": "Send an Email",
+      "webhookId": "278fc2c9-64d5-484c-af7b-8fdd64b813d2",
+      "credentials": {
+        "smtp": {
+          "id": "Mh5ga2I5om8jlgOW",
+          "name": "SMTP account"
+        }
+      }
     },
     {
       "parameters": {
@@ -75,16 +90,16 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        448,
-        0
+        672,
+        -64
       ],
-      "id": "51bdfe07-fed7-4583-bf3a-d34fb6fc3b99",
+      "id": "5033c01c-b771-4bdb-94d7-2e16cd4da708",
       "name": "If"
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "=={{\n  {\n    statut: $json.statut,\n    message: $json.message,\n    champs_manquants: $json.champs_manquants ?? []\n  }\n}}",
+        "responseBody": "=={{ $json }}\n",
         "options": {
           "responseCode": 400
         }
@@ -92,10 +107,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        672,
-        208
+        896,
+        144
       ],
-      "id": "6ae7e678-6192-447c-8c5c-61845b25df66",
+      "id": "0c6708c4-440a-4efd-8be0-61cc0938922d",
       "name": "Respond to Webhook1"
     },
     {
@@ -107,10 +122,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1120,
-        0
+        1344,
+        -64
       ],
-      "id": "c2ecf659-e7b3-4df6-9695-a26942371ee0",
+      "id": "c7f7a9e4-8b82-402f-b41f-cc84470b024c",
       "name": "Valider demande de congé2"
     },
     {
@@ -142,10 +157,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        896,
-        0
+        1120,
+        -64
       ],
-      "id": "42910dbf-f5b1-4ad6-88b7-c10fd5fd9d32",
+      "id": "ef4922e9-db1c-4257-ac9b-6c4c7bec48a3",
       "name": "Préparer réponse"
     }
   ],
@@ -214,11 +229,18 @@
       ]
     }
   },
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
+  "versionId": "82ba3201-366c-4226-9444-7ec0e8123e49",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d5836d103f3b2a787838a5ad5f3c82f36331432b7b4f2e1dc3c80c1f0d559b8c"
+  },
   "nodeGroups": [],
+  "id": "9xub2NHbHhz69YvX",
   "tags": []
 }

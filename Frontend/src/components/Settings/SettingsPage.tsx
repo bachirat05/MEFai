@@ -249,15 +249,6 @@ function SettingsPage({
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-xl bg-slate-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Nom
-                </p>
-                <p className="mt-1 text-sm font-semibold text-slate-800">
-                  {user.displayName || "Non renseigne"}
-                </p>
-              </div>
-
-              <div className="rounded-xl bg-slate-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                   Email
                 </p>
                 <p className="mt-1 truncate text-sm font-semibold text-slate-800">

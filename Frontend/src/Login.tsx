@@ -78,14 +78,15 @@ function Login() {
 
         {/* Logo */}
         <div className="mb-8 text-center">
+          <img
+            src="/MEFai.png"
+            alt="Logo du Ministère"
+            className="mx-auto mb-5 h-24 w-24 object-contain"
+          />
 
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600 text-white shadow-xl shadow-violet-200">
-            <Sparkles size={30} />
-          </div>
-
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Assistant IA
-          </h1>
+          {/*<h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            MEFai
+          </h1>*/}
 
           <p className="mt-2 text-sm text-slate-500">
             Assistant intelligent du Ministère

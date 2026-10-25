@@ -126,7 +126,7 @@ function AdminDashboard({
           </div>
         ) : null}
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <StatCard
             label="Documents"
             value={
@@ -137,14 +137,6 @@ function AdminDashboard({
             caption="Fichiers indexes dans la base RAG"
             icon={FileText}
             tone="violet"
-          />
-
-          <StatCard
-            label="Demandes de conge"
-            value="Non disponible"
-            caption="Aucun agregat global expose"
-            icon={Workflow}
-            tone="blue"
           />
 
           <StatCard

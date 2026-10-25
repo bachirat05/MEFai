@@ -1,4 +1,4 @@
-Document de démonstration Cortex AI.
+Document de démonstration MEFai.
 
 La prime de transport fictive pour les tests est de 777 dirhams par mois.
 

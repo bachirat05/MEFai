@@ -12,4 +12,4 @@ L'accès aux applications internes doit respecter les règles d'authentification
 
 Tout incident de sécurité constaté pendant une période de télétravail doit être signalé sans délai au service compétent.
 
-Ce document est fictif et destiné uniquement aux tests du système RAG Cortex AI.
+Ce document est fictif et destiné uniquement aux tests du système RAG MEFai.

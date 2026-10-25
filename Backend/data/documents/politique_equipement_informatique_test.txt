@@ -1,6 +1,6 @@
 POLITIQUE INTERNE D'ÉQUIPEMENT INFORMATIQUE — DOCUMENT DE TEST
 
-Ce document est utilisé uniquement pour tester le système RAG Cortex AI.
+Ce document est utilisé uniquement pour tester le système RAG MEFai.
 
 1. Attribution du matériel
 Chaque nouvel employé reçoit un ordinateur portable professionnel lors de son intégration.
